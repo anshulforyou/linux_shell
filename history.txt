@@ -1,0 +1,195 @@
+echo anshul is here
+
+echo -e hellop world
+
+ls
+
+pwd
+
+pwd
+
+pwd
+
+pwd
+
+pwd
+
+pwd
+
+pwd
+
+pwd
+
+echo
+
+echo anshu
+
+pwd
+
+pwd
+
+echo
+
+echo anshul
+
+pwd anshul
+
+cd ..
+
+pwd anshul
+
+history an
+
+exit an
+
+history
+
+history anshul
+
+date a
+
+ls 1
+
+exit 1
+
+exit chgfhgh
+
+
+
+
+
+cd ..
+
+pwd hj
+
+cd ..
+
+pwd
+
+pwd hgjhgj
+
+pwd
+
+
+
+pwd
+
+pwd 12
+
+echo anshul
+
+ls
+
+ls asn
+
+ls -a
+
+lsd
+
+ls ajlsk
+
+pwd 
+
+pwd
+
+ls 
+
+date 
+
+ls 
+
+ls gj
+
+exit
+
+ls
+
+ls 
+
+pwd 
+
+ls 
+
+ls -a
+
+ls -a   
+
+
+
+ls  
+
+ls -a 
+
+
+
+ls -a
+
+ls -a
+
+
+ls
+ls
+ls -a
+ls
+ls
+ls
+[A[A[B
+ls
+ls -a
+
+
+
+
+ls -A
+
+
+
+
+ls
+mkdir
+mkdir anshul
+mkdir anshul
+mkdir -p hello/world
+mkdir -p hello/world
+cat mkdir.c
+ls
+rm cat
+rm -i rm
+cat rm
+cat rm.c cat.c
+date
+ls
+ls -a
+ls
+ls -a
+ls -A
+ls
+ls
+ls
+ls -a
+cd ..
+ls -l
+ls
+ls
+ls -l
+ls -A
+ls -l
+ls -A
+echo anshul
+echo anshul
+echo anshul
+echo anshul
+echo where are y
+echo -n anshul
+pwd
+cd ..
+pwd
+history
+history -c
+date
+date
+date -R
+date -u
+date 
+date
+ls
