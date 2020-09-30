@@ -34,7 +34,7 @@ void calculate(char sec){
 			student++;
 			current=0;
 			field = (char *)malloc(500*sizeof(char));
-
+			
 		}
 		if(first[0]!=','){
 			field[current++]=first[0];
@@ -55,7 +55,7 @@ void calculate(char sec){
 			for(int j=2;j<6;j++){add+=atoi(details[j][i]);}
 			char avg[200];
 			float temp = (float)(add)/4;
-			printf("\n%s %s\n", "Id:", details[0][i]);
+			printf("%s %s\n", "Id: ", details[0][i]);
 			// printf("%s\n", details[]);
 			// printf("%s\n", details[1][i]);
 

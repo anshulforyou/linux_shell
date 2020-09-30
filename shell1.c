@@ -14,7 +14,7 @@ void echo1(char *token){
 	if (strcmp(token, "-E")==0){
 		token = strtok(NULL, " ");
 		while( token != NULL ) {
-	      	printf( "%s ", token ); //printing each token
+	      	printf( "%s\n", token ); //printing each token
 	      	token = strtok(NULL, " ");
    		}
 	}
@@ -30,13 +30,32 @@ void echo1(char *token){
 		// token = strtok(NULL, " ");
 		// printf("%s\n", token);
 		while( token != NULL ) {
-	      printf( "%s ", token ); //printing each token
+	      printf( "%s\n", token ); //printing each token
 	      token = strtok(NULL, " ");
 	   }
 	}
 }
 
-int process_cmd(char cmd[]){
+void cd_help(){
+	printf("%s\n", "Change the shell working directory.");
+	printf("%s\n", "Change the current directory to DIR.  The default DIR is the value of the HOME shell variable.");
+    printf("%s\n", "Options:");
+    printf("%s\n", "-L	force symbolic links to be followed: resolve symbolic");
+    printf("%s\n", "links in DIR after processing instances of `..'");  
+    		
+    printf("%s\n", "The default is to follow symbolic links, as if `-L' were specified.");
+	printf("%s\n", "`..' is processed by removing the immediately previous pathname component back to a slash or the beginning of DIR.");
+
+}
+
+void pwd_help(){
+	printf("%s\n", "Print the name of the current working directory.");
+	printf("%s\n", "Options:");
+	printf("%s\n", "-L	print the value of $PWD if it names the current working");
+	printf("%s\n", "directory.");
+}
+
+int process_cmd(char cmd[], char dir[]){
 	char cmdc[200];
 	strcpy(cmdc, cmd);
 
@@ -51,7 +70,8 @@ int process_cmd(char cmd[]){
 	// }
 
 	char cud[200];
-	getcwd(cud, 200);
+	strcpy(cud, dir);
+	// getcwd(cud, 200);
 
 	if (strcmp(first, "echo")==0){
 		token = strtok(NULL, " ");
@@ -59,21 +79,48 @@ int process_cmd(char cmd[]){
 		echo1(token);
 	}
 	else if(strcmp(first, "pwd")==0){
-		printf("Printing current working directory");
-		char dir[200];
-		getcwd(dir, 200);
-		printf("%s\n", dir);
+		token = strtok(NULL, " ");
+		if(token == NULL || strcmp("-L", token)==0){
+			printf("Printing current working directory");
+			char dir[200];
+			char* val = getcwd(dir, 200);
+			if(val == NULL){
+				if(errno==EACCES){
+					printf("%s\n", "PERMISSION DENIED");
+				}else if(errno == ENOENT){
+					printf("%s\n", "CURRENT WORKING DIRECTORY UNLNKED");
+				}
+			}
+
+			printf("%s\n", dir);	
+		}else if(strcmp("--help", token)==0){
+			pwd_help;
+		}
 	}
 	else if(strcmp(first, "cd")==0){
 		token = strtok(NULL, " ");
-		int temp = chdir(token);
-		if(temp==-1){
-			if(errno==EACCES)
-				printf("%s\n", "ACCESS NOT AVAILABLE TO CURRENT USER");
-			else if(errno == ENOENT)
-				printf("%s\n", "PATH NOT AVAILABLE");
-			else 
-				printf("%s\n", "ERROR OCCURED");
+		if (strcmp("-L", token)==0){
+			int temp = chdir(token);
+			if(temp==-1){
+				if(errno==EACCES)
+					printf("%s\n", "ACCESS NOT AVAILABLE TO CURRENT USER");
+				else if(errno == ENOENT)
+					printf("%s\n", "PATH NOT AVAILABLE");
+				else 
+					printf("%s\n", "ERROR OCCURED");
+			}	
+		}else if(strcmp("--help", token)){
+			cd_help();
+		}else{
+			int temp = chdir(token);
+			if(temp==-1){
+				if(errno==EACCES)
+					printf("%s\n", "ACCESS NOT AVAILABLE TO CURRENT USER");
+				else if(errno == ENOENT)
+					printf("%s\n", "PATH NOT AVAILABLE");
+				else 
+					printf("%s\n", "ERROR OCCURED");
+			}
 		}
 	}
 	else if(strcmp(first, "history")==0){
@@ -81,6 +128,16 @@ int process_cmd(char cmd[]){
 		if (token == NULL){
 			FILE *his = fopen("history.txt", "r");
 			char line[200];
+
+			if(his==NULL){
+				if(errno == ENFILE){
+					printf("%s\n", "NO MORE FILES CAN BE OPENED");
+				}else if(errno == EINVAL){
+					printf("%s\n", "INVALID ARGUMENTS, NOT ABLE TO OPEN FILE");
+				}else{
+					printf("%s\n", "NOT ABLE TO OPEN FILE, ERROR NOT RECOGNISED");
+				}
+			}
 
 			while(fgets(line, sizeof(line), his)){
 				// char *point;
@@ -95,7 +152,26 @@ int process_cmd(char cmd[]){
 			FILE *his = fopen("history.txt", "r");
 			char line[200];
 
+			if(his==NULL){
+				if(errno == ENFILE){
+					printf("%s\n", "NO MORE FILES CAN BE OPENED");
+				}else if(errno == EINVAL){
+					printf("%s\n", "INVALID ARGUMENTS, NOT ABLE TO OPEN FILE");
+				}else{
+					printf("%s\n", "NOT ABLE TO OPEN FILE, ERROR NOT RECOGNISED");
+				}
+			}
+
 			FILE *new = fopen(token, "w");
+			if(new==NULL){
+				if(errno == ENFILE){
+					printf("%s\n", "NO MORE FILES CAN BE OPENED");
+				}else if(errno == EINVAL){
+					printf("%s\n", "INVALID ARGUMENTS, NOT ABLE TO OPEN FILE");
+				}else{
+					printf("%s\n", "NOT ABLE TO OPEN FILE, ERROR NOT RECOGNISED");
+				}
+			}
 
 			while(fgets(line, sizeof(line), his)){
 				// char *point;
@@ -143,10 +219,10 @@ int process_cmd(char cmd[]){
 			strcat(cur, fl);
 
 			execlp(cur, cmdc, NULL);
-			}else{
-				wait(NULL);
-			}	
-		}
+		}else{
+			wait(NULL);
+		}	
+	}
 	
 	else if(strcmp(first, "cat")==0){
 		pid_t pid;
@@ -167,37 +243,65 @@ int process_cmd(char cmd[]){
 		}	
 	}
 	else if(strcmp(first, "mkdir")==0){
-		token = strtok(NULL, " ");
-		if(token != NULL){
-			char dir[200];
-			strcpy(dir, cud);
-			char fl[] = "/mkdir";
-			strcat(dir, fl);
+		pid_t pid;
+		pid = fork();
+		if(pid<0){
+			fprintf(stderr, "%s\n", "Fork Failed");
+		}else if (pid ==0){
+			token = strtok(NULL, " ");
+			if(token != NULL){
+				char dir[200];
+				strcpy(dir, cud);
+				char fl[] = "/mkdir";
+				strcat(dir, fl);
 
-			execlp(dir, cmdc, NULL);
+				execlp(dir, cmdc, cud, NULL);
+			}else{
+				printf("Directory name not entered");
+			}
 		}else{
-			printf("Directory name not entered");
+			wait(NULL);
 		}
 	}
 	else if(strcmp(first, "rm")==0){
-		token = strtok(NULL, " ");
-		if(token != NULL){
-			char dir[200];
-			strcpy(dir, cud);
-			char fl[] = "/rm";
-			strcat(dir, fl);
+		pid_t pid;
+		pid = fork();
+		if(pid<0){
+			fprintf(stderr, "%s\n", "Fork Failed");
+		}
+		else if (pid ==0){
+			token = strtok(NULL, " ");
+			if(token != NULL){
+				char dir[200];
+				strcpy(dir, cud);
+				char fl[] = "/rm";
+				strcat(dir, fl);
 
-			execlp(dir, cmdc, NULL);
-		}else{
-			printf("%s\n", "File name to be deleted is not entered");
+				execlp(dir, cmdc, NULL);
+			}else{
+				printf("%s\n", "File name to be deleted is not entered");
+			}
+		}
+		else{
+			wait(NULL);
 		}
 	}
 }
+
 void main(){
-	printf("Welcome to my own shell, this is a dangerous place to be in");
+	printf("%s\n", "Welcome to my own shell, this is a dangerous place to be in");
 	char cmd[100];
+	char cud[200];
+	char* val = getcwd(cud, 200);
+	if(val == NULL){
+		if(errno==EACCES){
+			printf("%s\n", "PERMISSION DENIED");
+		}else if(errno == ENOENT){
+			printf("%s\n", "CURRENT WORKING DIRECTORY UNLNKED");
+		}
+	}
 	while(strcmp(cmd, "exit")!=0){	
-		printf("\n>>> ");
+		printf(">>> ");
 		fgets(cmd,100,stdin);
 		strcmp(cmd, strtok(cmd, "\n"));
 		// printf("%s\n", cmd);
@@ -207,8 +311,17 @@ void main(){
 		// printf("%s\n", cmd);
 		FILE *fptr;
 		fptr = fopen("history.txt", "a+");
+		if(fptr==NULL){
+			if(errno == ENFILE){
+				printf("%s\n", "NO MORE FILES CAN BE OPENED");
+			}else if(errno == EINVAL){
+				printf("%s\n", "INVALID ARGUMENTS, NOT ABLE TO OPEN FILE");
+			}else{
+				printf("%s\n", "NOT ABLE TO OPEN FILE, ERROR NOT RECOGNISED");
+			}
+		}
 		fprintf(fptr, "%s\n", cmd);
 		fclose(fptr);
-		process_cmd(cmd);
+		process_cmd(cmd, cud);
 	}
 }
